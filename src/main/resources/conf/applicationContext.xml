@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd 
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd
+	">
+	<!-- 自动扫描service和repository注解注释的类，并注册为spring bean -->
+	<context:component-scan base-package="com.maoxiaobing.scan">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Service" />
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Repository" />
+	</context:component-scan>
+	<!-- 基于注解的事物驱动 -->
+	<tx:annotation-driven />
+	<!-- 引入jdbc配置文件 -->
+	<util:properties id="jdbc"
+		location="classpath:conf/jdbc-config.properties" />
+	<!-- 引入dbcp配置文件 -->
+	<util:properties id="dbcp"
+		location="classpath:conf/dbcp-config.properties" />
+	<!-- 配置dbcp数据源，并用spel表达式引入jdbc和dbcp配置的属性 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="#{jdbc['driver']}" />
+		<property name="url" value="#{jdbc['url']}" />
+		<property name="username" value="#{jdbc['username']}" />
+		<property name="password" value="#{jdbc['password']}" />
+		<property name="testOnBorrow" value="#{dbcp['testOnBorrow']}" />
+		<property name="testOnReturn" value="#{dbcp['testOnReturn']}" />
+		<property name="testWhileIdle" value="#{dbcp['testWhileIdle']}" />
+		<property name="validationQuery" value="#{dbcp['validationQuery']}" />
+		<property name="defaultAutoCommit" value="#{dbcp['defaultAutoCommit']}" />
+		<property name="maxIdle" value="#{dbcp['maxIdle']}" />
+		<property name="maxActive" value="#{dbcp['maxActive']}" />
+		<property name="minEvictableIdleTimeMillis" value="#{dbcp['minEvictableIdleTimeMillis']}" />
+		<property name="timeBetweenEvictionRunsMillis" value="#{dbcp['timeBetweenEvictionRunsMillis']}" />
+	</bean>
+
+	<!-- 配置mybatis会话工厂bean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation">
+			<value>classpath:conf/mybatis-config.xml</value>
+		</property>
+		<property name="mapperLocations">
+			<value>classpath:conf/mybatis/**/*Mapper.xml</value>
+		</property>
+	</bean>
+
+	<!-- 自动扫描映射类并为映射类注入session工厂bean -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage">
+			<value>
+				com.maoxiaobing.mybatis.mapper
+			</value>
+		</property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<!-- 定义事物管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+</beans>
