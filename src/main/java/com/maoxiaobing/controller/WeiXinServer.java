@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.maoxiaobing.util.MsgHandler;
-import com.maoxiaobing.util.ValidateUtil;
 
 @Controller
 @RequestMapping("/mwserver")
@@ -22,17 +21,14 @@ public class WeiXinServer {
 			HttpServletResponse response) {
 		OutputStream os = null;
 		try {
+			request.setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
 			boolean isGet = request.getMethod().toLowerCase().equals("get");
 			String result = "";
 			String xml;
 			if (isGet) {
-				String signature = request.getParameter("signature");
-				String timestamp = request.getParameter("timestamp");
-				String nonce = request.getParameter("nonce");
 				String echostr = request.getParameter("echostr");
-				Boolean flag = ValidateUtil.checkSignature(signature,
-						timestamp, nonce);
-				if (flag) {
+				if (echostr != null && echostr.length() > 0) {
 					result = echostr;
 				}
 			} else {
@@ -45,7 +41,11 @@ public class WeiXinServer {
 					sb.append(s);
 				}
 				xml = sb.toString();
+				System.out.println("接收的结果为：" + xml
+						+ "*****************************");
 				result = MsgHandler.processWechatMag(xml);
+				System.out.println("返回结果为：" + result
+						+ "***********************");
 			}
 			os = response.getOutputStream();
 			os.write(result.getBytes("UTF-8"));
