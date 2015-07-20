@@ -19,4 +19,19 @@ public class TestHttpUtil {
 		params.put("password", "123456");
 		System.out.println(HttpUtil.getPostJsonResult(url.toString(), params));
 	}
+
+	@Test
+	public void testValidateWeixinServer() {
+		StringBuffer url = new StringBuffer();
+		url.append("http://localhost/crawler");
+		url.append("/");
+		url.append("mwserver/echo.do");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("signature", "毛小冰");
+		params.put("timestamp", "123456");
+		params.put("nonce", "123456");
+		params.put("echostr", "123456");
+		String result = HttpUtil.getPostJsonResult(url.toString(), params);
+		System.out.println(result);
+	}
 }
