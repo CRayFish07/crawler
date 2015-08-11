@@ -25,6 +25,7 @@
 	<!-- 基于注解的事物驱动 -->
 	<tx:annotation-driven />
 	<!-- 引入jdbc配置文件 -->
+	<util:properties id="mongo" location="classpath:conf/mongo.properties" />
 	<util:properties id="jdbc"
 		location="classpath:conf/jdbc-config.properties" />
 	<!-- 引入dbcp配置文件 -->
@@ -58,7 +59,6 @@
 			<value>classpath:conf/mybatis/**/*Mapper.xml</value>
 		</property>
 	</bean>
-
 	<!-- 自动扫描映射类并为映射类注入session工厂bean -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage">

@@ -15,7 +15,13 @@ public class MsgHandler {
 		ReceiveXmlEntity xmlEntity = ReceiveXmlProcess.getMsgEntity(xml);
 		String result = "";
 		if ("text".endsWith(xmlEntity.getMsgType())) {
-			result = TulingApiUtil.getTulingResult(xmlEntity.getContent());
+			String content = xmlEntity.getContent();
+			if (RedisUtil.ifExists(content)) {
+				result = RedisUtil.get(content);
+			} else {
+				result = TulingApiUtil.getTulingResult(xmlEntity.getContent());
+				RedisUtil.set(content, result, 60 * 60 * 12);
+			}
 		}
 		result = FormatXmlProcess.formatXmlAnswer(xmlEntity.getFromUserName(),
 				xmlEntity.getToUserName(), result);

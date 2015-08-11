@@ -3,12 +3,10 @@ package com.maoxiaobing.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
 import com.maoxiaobing.util.HttpUtil;
 
 public class TestHttpUtil {
-	@Test
+	//@Test
 	public void testGetPostJsonResult() {
 		StringBuffer url = new StringBuffer();
 		url.append("http://localhost/crawler");
@@ -20,7 +18,7 @@ public class TestHttpUtil {
 		System.out.println(HttpUtil.getPostJsonResult(url.toString(), params));
 	}
 
-	@Test
+	//@Test
 	public void testValidateWeixinServer() {
 		StringBuffer url = new StringBuffer();
 		url.append("http://localhost/crawler");
